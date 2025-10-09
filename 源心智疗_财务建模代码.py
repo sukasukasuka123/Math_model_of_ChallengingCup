@@ -15,37 +15,50 @@ import seaborn as sns
 
 # ==== 参数定义 ====
 params = {
-    "pilot_universities": 5,           # 参与试点的高校数量
-    "students_per_uni": 20000,         # 每所高校的学生数
-    "scenarios": {                     # 不同市场情景假设
-        "conservative": {              # 保守场景
-            "adoption_rate": 0.05,     # 采用率（5%的学生使用）
-            "price_per_user_year": 1.0,# 每用户每年收入（美元）
-            "hosting_cost_per_user_month": 1.0,  # 每用户每月服务器成本
-            "other_opex_pct": 0.35     # 其他运营成本占收入比例
+    "pilot_universities": 5,  # 不变：试点数量
+    "students_per_uni": 20000,  # 不变：每校人数（典型本科规模）
+
+    "scenarios": {
+        "conservative": {  # 保守场景
+            "adoption_rate": 0.03,  # 下调至3%（初期接受度低）
+            "price_per_user_year": 30.0,  # 市场主流低价区间
+            "hosting_cost_per_user_month": 5.0,  # 见下方计算说明
+            "other_opex_pct": 0.40  # 成本占比高（人工运营多）
         },
-        "base": {                      # 基础场景
+        "base": {  # 基础场景
             "adoption_rate": 0.10,
-            "price_per_user_year": 10.0,
-            "hosting_cost_per_user_month": 0.5,
-            "other_opex_pct": 0.20
+            "price_per_user_year": 60.0,  # 中位定价
+            "hosting_cost_per_user_month": 2.5,
+            "other_opex_pct": 0.25
         },
-        "aggressive": {                # 激进场景
-            "adoption_rate": 0.20,
-            "price_per_user_year": 30.0,
-            "hosting_cost_per_user_month": 0.3,
+        "aggressive": {  # 激进场景
+            "adoption_rate": 0.20,  # 上调至20%（广泛宣传+政策推动）
+            "price_per_user_year": 80.0,
+            "hosting_cost_per_user_month": 1.8,
             "other_opex_pct": 0.15
         },
     },
-    "mvp_dev_cost_usd": 40000.0,       # MVP产品开发成本
-    "cac_per_uni": 5000.0,             # 每高校获客成本（CAC）
-    "gpu_monthly_cost_usd": 500.0,     # GPU服务器每月成本
-    "ops_salary_annual_usd": 30000.0,  # 运维年薪
-    "discount_rate": 0.10,             # 折现率（10%）
-    "horizon_years": 3,                # 模型周期（3年）
-    "growth_rate_users": 0.25          # 用户年增长率（25%）
-}
 
+    # --- 成本类参数更新 ---
+    "mvp_dev_cost_usd": 60000.0,  # 提升至$6万 ≈ ¥43万（含UI、后端、AI微调、合规）
+    # 包括：前端开发（Vue）+ 后端（Django/FastAPI）
+    #       + 多模态模型微调（BERT/Vision Transformer）
+    #       + 数据加密与GDPR级隐私设计
+
+    "cac_per_uni": 10000.0,  # 更新为¥10,000/高校（含地推、宣讲、合同谈判）
+
+    "gpu_monthly_cost_usd": 800.0,  # 换算自阿里云A10实例 ¥5,800/月 ÷ 7.2 ≈ $805
+    # 使用 ecs.gn7i-c8g1.4xlarge（适合推理）
+    # 或按需使用Serverless API降低长期成本
+
+    "ops_salary_annual_usd": 28000.0,  # ¥20万 ÷ 7.2 ≈ $27,778 → 四舍五入 $28k
+
+    "discount_rate": 0.12,  # 更新为12%（反映初创企业融资成本）
+
+    "horizon_years": 3,  # 不变（短期预测周期合理）
+
+    "growth_rate_users": 0.30  # 更新为30% CAGR（基于同类SaaS增长数据）
+}
 
 # ==== 场景财务计算 ====
 def scenario_financials(params, scen_key):
